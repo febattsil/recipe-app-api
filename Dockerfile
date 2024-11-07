@@ -7,7 +7,7 @@
 # Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
 ARG PYTHON_VERSION=3.9.6
-FROM python:${PYTHON_VERSION}-slim as base
+FROM python:${PYTHON_VERSION}-alpine as base
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -43,15 +43,19 @@ EXPOSE 8000
 ARG DEV=false
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+    python3 -m pip install -r requirements.txt
 
-RUN python -m venv /py && \
+RUN python3 -m venv /py && \
     /py/bin/pip install --upgrade pip && \
+    apk add --update --no-cache postgresql-client && \
+    apk add --update --no-cache --virtual .tmp-build-deps \
+        build-base postgresql-dev musl-dev && \
     /py/bin/pip install -r /tmp/requirements.txt && \
     if [ $DEV = "true" ]; \
         then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
     fi && \
     rm -rf /tmp && \
+    apk del .tmp-build-deps && \
     adduser \
         --disabled-password \
         --no-create-home \
