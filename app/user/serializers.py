@@ -21,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Create and return an user with encrypted password. """
+        print(validated_data)
         return get_user_model().objects.create_user(**validated_data)
 
     def udpate(self, instance, validated_data):
@@ -52,7 +53,7 @@ class AuthTokenSerializer(serializers.Serializer):
             password=password,
         )
         if not user:
-            msg = _('Unable to authenticate th providaded credentials.')
+            msg = _('Unable to authenticate the providaded credentials.')
             raise serializers.ValidationError(msg, code='authorization')
 
         attrs['users'] = user
