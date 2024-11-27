@@ -71,11 +71,11 @@ class PublicUserApiTests(TestCase):
     def test_create_token_for_user(self):
         """Test generates token for valid credentials. """
         user_details = {
-            'name': 'Test Name',
             'email': 'test@example.com',
             'password': 'test-user-password123',
+            'name': 'Test Name',
         }
-        get_user_model().objects.create_user(**user_details)
+        create_user(**user_details)
 
         payload = {
             'email': user_details['email'],
@@ -130,7 +130,7 @@ class PrivateUserAPITest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {
             'name': self.user.name,
-            'email': self.user.email
+            'email': self.user.email,
         })
 
     def test_post_me_not_allowed(self):
@@ -141,7 +141,7 @@ class PrivateUserAPITest(TestCase):
 
     def test_update_user_profile(self):
         """Test updating the user profile for the authenticated user. """
-        payload = {'name': 'Updated Name', 'password': 'newpassword123'}
+        payload = {'name': 'Updated name', 'password': 'newpassword123',}
 
         res = self.client.patch(ME_URL, payload)
 
@@ -149,5 +149,3 @@ class PrivateUserAPITest(TestCase):
         self.assertEqual(self.user.name, payload['name'])
         self.assertTrue(self.user.check_password(payload['password']))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-
-
